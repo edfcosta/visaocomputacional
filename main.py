@@ -48,19 +48,22 @@ def segment_kmeans(frame):
     centers = np.uint8(centers)
     segmented = centers[labels.flatten()].reshape(frame.shape)
 
-    target_color = np.array([0, 255, 0]) if args.target == "green" else np.array([255, 0, 0])
+    target_color = np.array([0, 255, 0]) if args.target == "green" else np.array([0, 0, 255])
     distances = np.linalg.norm(centers - target_color, axis=1)
     cluster_target = np.argmin(distances)
 
     mask = (labels.flatten() == cluster_target).astype(np.uint8).reshape(frame.shape[:2]) * 255
+    #mask_inv = cv2.bitwise_not(mask)
     result = cv2.bitwise_and(frame, frame, mask=mask)
     return mask, result
+   
 
 # ------------------------------
 # Função auxiliar para salvar resultados
 # ------------------------------
 def salvar_resultados(frame, mask, result, basename):
-    overlay = cv2.addWeighted(frame, 0.7, result, 0.3, 0)
+    #overlay = cv2.addWeighted(frame, 0.7, result, 0.3, 0)
+    overlay = result.copy()
     cv2.imwrite(f"outputs/{basename}_mask.png", mask)
     cv2.imwrite(f"outputs/{basename}_overlay.png", overlay)
     print(f"[+] Resultados salvos em outputs/{basename}_*.png")
